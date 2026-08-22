@@ -60,16 +60,11 @@
   letter-spacing: -0.03em;
 }
 
-.login-brand-mark {
+.login-brand-logo {
   width: 31px;
   height: 31px;
-  display: grid;
-  place-items: center;
-  color: #f6fff3;
-  background: var(--auth-night);
-  border-radius: 11px 11px 11px 4px;
-  font-size: 21px;
-  line-height: 1;
+  display: block;
+  object-fit: contain;
 }
 
 .balance-window {

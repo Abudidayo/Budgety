@@ -1,5 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { useState } from 'react';
+import budgetyLogo from '../assets/budgety-logo.svg';
 import './LoginPage.css';
 
 export function LoginPage() {
@@ -23,9 +24,7 @@ export function LoginPage() {
     <main className="auth-page">
       <section className="login-panel" aria-labelledby="login-title">
         <div className="login-brand" aria-label="Budgety">
-          <span className="login-brand-mark" aria-hidden="true">
-            b
-          </span>
+          <img className="login-brand-logo" src={budgetyLogo} alt="" />
           <span>Budgety</span>
         </div>
 

@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "dev": "node --watch server.mjs"
+    "dev": "node --watch server.mjs",
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "calibrate": "node scripts/calibrate.mjs",
+    "try": "node scripts/try.mjs"
   },
   "dependencies": {
     "jose": "^5.9.6"

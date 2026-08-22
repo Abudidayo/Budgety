@@ -50,10 +50,16 @@ const HISTORY_DAYS = Number.parseInt(process.env.HISTORY_DAYS ?? '90', 10);
 const CONSENT_DAYS = Number.parseInt(process.env.CONSENT_DAYS ?? '90', 10);
 
 /**
- * Load a PEM from either an inline env var or a path. Railway variables cannot
- * hold newlines reliably, so `\n` escapes are unescaped here.
+ * Load a PEM from a base64 env var, an inline env var, or a file path.
+ *
+ * BASE64 IS THE ONLY RELIABLE FORM FOR RAILWAY. Setting a raw PEM via the
+ * Railway CLI silently drops the `-----BEGIN PRIVATE KEY-----` header line,
+ * which produces a key that looks present but fails to sign — and the failure
+ * surfaces as a generic "provider unreachable", nowhere near the real cause.
+ * Base64 has no newlines and no leading dashes, so nothing can mangle it.
  */
-function loadPem(inline, path) {
+function loadPem(b64, inline, path) {
+  if (b64) return Buffer.from(b64, 'base64').toString('utf8');
   if (inline) return inline.includes('\\n') ? inline.replace(/\\n/g, '\n') : inline;
   if (path) return readFileSync(path, 'utf8');
   return null;
@@ -67,8 +73,19 @@ const APPS = {
 
 function buildApp(prefix) {
   const applicationId = process.env[`${prefix}_APP_ID`];
-  const privateKeyPem = loadPem(process.env[`${prefix}_PRIVATE_KEY`], process.env[`${prefix}_KEY_PATH`]);
+  const privateKeyPem = loadPem(
+    process.env[`${prefix}_PRIVATE_KEY_B64`],
+    process.env[`${prefix}_PRIVATE_KEY`],
+    process.env[`${prefix}_KEY_PATH`],
+  );
   if (!applicationId || !privateKeyPem) return null;
+  if (!privateKeyPem.includes('BEGIN')) {
+    console.error(
+      `[config] ${prefix} private key is missing its PEM header — it was probably ` +
+        'truncated in transit. Use ' + prefix + '_PRIVATE_KEY_B64 with a base64-encoded key.',
+    );
+    return null;
+  }
   return { applicationId, privateKeyPem, env: prefix === 'EB_SANDBOX' ? 'sandbox' : 'production' };
 }
 

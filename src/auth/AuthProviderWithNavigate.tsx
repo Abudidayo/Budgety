@@ -55,6 +55,17 @@ export function AuthProviderWithNavigate({ children }: PropsWithChildren) {
       }}
       onRedirectCallback={handleRedirect}
       skipRedirectCallback={isBankCallback}
+      /**
+       * The bank connect flow is a FULL-PAGE redirect off to the bank and back.
+       * Auth0 caches tokens in memory by default, so that round trip destroys
+       * the session and the user lands back on /login having lost their place.
+       *
+       * Persisting to localStorage (plus refresh tokens, so silent renewal does
+       * not depend on third-party cookies) is what makes returning from the
+       * bank land on the dashboard instead of the login screen.
+       */
+      cacheLocation="localstorage"
+      useRefreshTokens={true}
     >
       {children}
     </Auth0Provider>

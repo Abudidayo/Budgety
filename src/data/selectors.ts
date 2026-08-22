@@ -93,6 +93,9 @@ export const TOTAL_BUDGET_PENCE = CATEGORIES.reduce(
  * Prioritises the biggest overspend, then near-limit categories.
  */
 export function heroInsight(summaries: CategorySummary[]): string {
+  if (summaries.every((s) => s.spentPence === 0)) {
+    return 'Nothing to report yet — connect a bank account and Budgety will explain where your money goes.';
+  }
   const over = [...summaries]
     .filter((s) => s.status === 'over')
     .sort((a, b) => b.spentPence - b.budgetPence - (a.spentPence - a.budgetPence));

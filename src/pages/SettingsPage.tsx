@@ -19,6 +19,11 @@ export function SettingsPage() {
 
       <div className="card settings-accounts">
         <p className="settings-accounts-label">Connected accounts</p>
+        {ACCOUNTS.length === 0 && (
+          <p className="settings-accounts-empty">
+            No accounts connected yet.
+          </p>
+        )}
         <ul className="settings-accounts-list">
           {ACCOUNTS.map((account) => (
             <li key={account.id} className="settings-account-row">

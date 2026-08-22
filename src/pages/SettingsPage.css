@@ -101,3 +101,10 @@
 .settings-manage-pill:disabled {
   cursor: not-allowed;
 }
+
+.settings-accounts-empty {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  padding: 6px 0 2px;
+}

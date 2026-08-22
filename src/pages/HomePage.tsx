@@ -86,6 +86,11 @@ export function HomePage() {
         </a>
       </h2>
       <div className="home-tx">
+        {txs.length === 0 && (
+          <div className="home-tx-empty">
+            No transactions yet. Connect an account to see your spending here.
+          </div>
+        )}
         {txs.map((t) => (
           <div className="home-tx-row" key={t.id}>
             <div className="home-tx-ic">{txEmoji(t)}</div>

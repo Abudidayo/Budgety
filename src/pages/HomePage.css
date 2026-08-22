@@ -136,3 +136,11 @@
 .home-tx-amt-in {
   color: var(--leaf-deep);
 }
+
+.home-tx-empty {
+  padding: 22px 4px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-align: center;
+}

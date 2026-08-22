@@ -13,6 +13,20 @@ import { createRemoteJWKSet, jwtVerify } from 'jose';
 
 const domain = process.env.AUTH0_DOMAIN;
 const audience = process.env.AUTH0_AUDIENCE;
+/**
+ * Auth0 SPA client id. Used as the accepted audience for ID tokens.
+ *
+ * WHY: an access token only exists once an API is registered in Auth0 and the
+ * SPA requests that `audience`. Until then the SPA can only obtain an ID token.
+ * Rather than ship an app that 401s on every call, we accept an ID token whose
+ * `aud` is this client id — still fully JWKS-verified, so it is a real
+ * cryptographic identity check, not a decode-and-trust.
+ *
+ * It is a weaker guarantee than an access token (ID tokens are meant for the
+ * client, not for APIs), so once AUTH0_AUDIENCE is set, access tokens are
+ * accepted too and should be preferred.
+ */
+const clientId = process.env.AUTH0_CLIENT_ID;
 
 /**
  * Escape hatch for local development only. Never set this in Railway.
@@ -52,11 +66,12 @@ export async function authenticate(req) {
   if (!token) throw new AuthError('unauthenticated', 'Missing bearer token.');
 
   try {
+    const accepted = [audience, clientId].filter(Boolean);
     const { payload } = await jwtVerify(token, getJwks(), {
       issuer: `https://${domain}/`,
-      // Only enforce audience when configured, so the service still boots
-      // before the Auth0 API has been registered.
-      ...(audience ? { audience } : {}),
+      // Accept either an access token (our API audience) or an ID token (the
+      // SPA client id). Both are verified against Auth0's JWKS.
+      ...(accepted.length ? { audience: accepted } : {}),
     });
     if (!payload.sub) throw new AuthError('unauthenticated', 'Token has no subject.');
     return { userId: String(payload.sub), claims: payload };
@@ -70,6 +85,7 @@ export function authStatus() {
   return {
     domainConfigured: Boolean(domain),
     audienceConfigured: Boolean(audience),
+    idTokenFallback: Boolean(clientId) && !audience,
     devBypassEnabled: devBypass,
   };
 }

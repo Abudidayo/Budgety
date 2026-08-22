@@ -1,4 +1,4 @@
-import { CATEGORIES, TODAY, TRANSACTIONS } from './fixtures';
+import { CATEGORIES } from './fixtures';
 import type { AccountId, Category, CategoryId, Period, Transaction } from './types';
 
 export type AccountFilter = AccountId | 'all';
@@ -24,14 +24,25 @@ function periodStart(period: Period, today: string): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** Transactions in the selected period/account, newest first. */
+/** Today, as the app sees it. Live data is real, so this is the real date. */
+export function currentDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Transactions in the selected period/account, newest first.
+ *
+ * Takes the transaction list as a parameter rather than reading a module-level
+ * fixture, so live and fixture data flow through identical code.
+ */
 export function visibleTransactions(
+  transactions: Transaction[],
   period: Period,
   account: AccountFilter,
-  today: string = TODAY,
+  today: string = currentDate(),
 ): Transaction[] {
   const start = periodStart(period, today);
-  return TRANSACTIONS.filter(
+  return transactions.filter(
     (t) =>
       t.date >= start &&
       t.date <= today &&
@@ -120,12 +131,13 @@ export function heroInsight(summaries: CategorySummary[]): string {
 
 /** Spend per calendar day for the month containing `today`: { "2026-08-07": 4570, ... } */
 export function dailySpend(
+  transactions: Transaction[],
   account: AccountFilter,
-  today: string = TODAY,
+  today: string = currentDate(),
 ): Map<string, number> {
   const start = `${today.slice(0, 8)}01`;
   const map = new Map<string, number>();
-  for (const t of TRANSACTIONS) {
+  for (const t of transactions) {
     if (
       t.kind === 'spend' &&
       t.date >= start &&
@@ -139,10 +151,14 @@ export function dailySpend(
 }
 
 /** Dates in the current month with income (green dot on the calendar). */
-export function incomeDays(account: AccountFilter, today: string = TODAY): Set<string> {
+export function incomeDays(
+  transactions: Transaction[],
+  account: AccountFilter,
+  today: string = currentDate(),
+): Set<string> {
   const start = `${today.slice(0, 8)}01`;
   return new Set(
-    TRANSACTIONS.filter(
+    transactions.filter(
       (t) =>
         t.kind === 'income' &&
         t.date >= start &&
@@ -158,7 +174,7 @@ const MONTH_NAMES = [
 ];
 
 /** "Today · Sat 22 Aug", "Yesterday · Fri 21 Aug", else "Wed 19 Aug". */
-export function friendlyDate(date: string, today: string = TODAY): string {
+export function friendlyDate(date: string, today: string = currentDate()): string {
   const d = new Date(`${date}T00:00:00Z`);
   const label = `${DAY_NAMES[d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()} ${MONTH_NAMES[d.getUTCMonth()]}`;
   const t = new Date(`${today}T00:00:00Z`);

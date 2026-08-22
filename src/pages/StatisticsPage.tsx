@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { TODAY } from '../data/fixtures';
 import {
   categorySummaries,
+  currentDate,
   dailySpend,
   formatGBP,
   incomeDays,
@@ -34,13 +34,16 @@ function bucketClass(pence: number): string {
 }
 
 export function StatisticsPage() {
-  const { account } = useApp();
+  const { account, transactions } = useApp();
 
-  const txs = useMemo(() => visibleTransactions('month', account), [account]);
+  const txs = useMemo(
+    () => visibleTransactions(transactions, 'month', account),
+    [transactions, account],
+  );
   const spent = spentTotal(txs);
   const income = incomeTotal(txs);
-  const spendByDay = useMemo(() => dailySpend(account), [account]);
-  const incomeByDay = useMemo(() => incomeDays(account), [account]);
+  const spendByDay = useMemo(() => dailySpend(transactions, account), [transactions, account]);
+  const incomeByDay = useMemo(() => incomeDays(transactions, account), [transactions, account]);
 
   // --- Card 1: donut segments ---
   const summaries = categorySummaries(txs);
@@ -75,7 +78,8 @@ export function StatisticsPage() {
   const keptPence = Math.max(0, income - spent);
   const keptPct = income > 0 ? Math.round((keptPence / income) * 100) : 0;
 
-  // --- Card 3: calendar for TODAY's month ---
+  // --- Card 3: calendar for the current month ---
+  const TODAY = currentDate();
   const year = Number(TODAY.slice(0, 4));
   const month = Number(TODAY.slice(5, 7)); // 1-based
   const todayDay = Number(TODAY.slice(8, 10));

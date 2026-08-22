@@ -4,6 +4,12 @@ import { useNavigate } from 'react-router-dom';
 
 const domain = import.meta.env.VITE_AUTH0_DOMAIN;
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
+/**
+ * Required for the SPA to receive an ACCESS token rather than only an ID token.
+ * Must match an API registered in Auth0, and AUTH0_AUDIENCE on the API service.
+ * Without it the API cannot verify who is calling.
+ */
+const audience = import.meta.env.VITE_AUTH0_AUDIENCE;
 
 export function AuthProviderWithNavigate({ children }: PropsWithChildren) {
   const navigate = useNavigate();
@@ -33,7 +39,10 @@ export function AuthProviderWithNavigate({ children }: PropsWithChildren) {
     <Auth0Provider
       domain={domain}
       clientId={clientId}
-      authorizationParams={{ redirect_uri: window.location.origin }}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        ...(audience ? { audience } : {}),
+      }}
       onRedirectCallback={handleRedirect}
     >
       {children}

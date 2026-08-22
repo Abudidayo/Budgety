@@ -318,3 +318,13 @@ button {
   width: 100%; border: 0; border-radius: 999px; padding: 13px 0; margin-top: 12px;
   background: var(--ink); color: #fff; font-weight: 800; font-size: 14.5px;
 }
+
+.bank-picker { margin-top: 14px; }
+.bank-picker-group {
+  font-family: 'Baloo 2', cursive; font-size: 15px; color: var(--ink);
+  margin: 14px 0 8px;
+}
+.bank-picker-cancel {
+  width: 100%; border: 0; background: transparent; color: var(--ink-soft);
+  font-weight: 800; font-size: 14px; padding: 12px 0; margin-top: 4px;
+}

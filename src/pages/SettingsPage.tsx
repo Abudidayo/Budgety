@@ -1,6 +1,7 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { getDisplayName } from '../auth/userName';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { BankPicker } from '../components/BankPicker';
 import { formatGBP } from '../data/selectors';
 import { useApp } from '../state/AppContext';
 import './SettingsPage.css';
@@ -8,11 +9,12 @@ import './SettingsPage.css';
 export function SettingsPage() {
   const { logout, user } = useAuth0();
   const { accounts, bankName, disconnect } = useApp();
-  const navigate = useNavigate();
+  const [picking, setPicking] = useState(false);
 
   const handleDisconnect = async () => {
     await disconnect();
-    navigate('/connect');
+    // Stay on Settings — this is where reconnecting happens.
+    setPicking(false);
   };
 
   const handleLogout = () => {
@@ -56,12 +58,14 @@ export function SettingsPage() {
             </li>
           ))}
         </ul>
-        {accounts.length > 0 ? (
+        {picking ? (
+          <BankPicker onCancel={() => setPicking(false)} />
+        ) : accounts.length > 0 ? (
           <button type="button" className="settings-logout" onClick={() => void handleDisconnect()}>
             Disconnect bank
           </button>
         ) : (
-          <button type="button" className="settings-connect" onClick={() => navigate('/connect')}>
+          <button type="button" className="settings-connect" onClick={() => setPicking(true)}>
             Connect a bank
           </button>
         )}

@@ -12,7 +12,6 @@ import {
   VerifyEmailPage,
 } from './pages/LoginPage';
 import { CallbackPage } from './pages/CallbackPage';
-import { ConnectPage } from './pages/ConnectPage';
 import { PrivacyPage, TermsPage } from './pages/LegalPages';
 import { SettingsPage } from './pages/SettingsPage';
 import { StatisticsPage } from './pages/StatisticsPage';
@@ -62,7 +61,6 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route path="/callback" element={<CallbackPage />} />
-      <Route path="/connect" element={<ConnectPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route

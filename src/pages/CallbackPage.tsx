@@ -58,8 +58,8 @@ export function CallbackPage() {
       <p className="callback-msg" role="status">{message}</p>
       {failed && (
         <div className="callback-actions">
-          <button className="callback-btn" onClick={() => navigate('/connect', { replace: true })}>
-            Try again
+          <button className="callback-btn" onClick={() => navigate('/settings', { replace: true })}>
+            Back to Settings
           </button>
         </div>
       )}

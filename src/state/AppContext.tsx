@@ -70,7 +70,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       // Preferred: a real access token, which only exists once an API is
       // registered in Auth0 and VITE_AUTH0_AUDIENCE is set.
-      return await getAccessTokenSilently();
+      //
+      // CAREFUL: with no audience configured Auth0 returns an OPAQUE token and
+      // this call SUCCEEDS, so a try/catch alone never reaches the fallback.
+      // A JWT has three dot-separated segments; anything else is opaque and
+      // unverifiable by the API.
+      const accessToken = await getAccessTokenSilently();
+      if (accessToken && accessToken.split('.').length === 3) return accessToken;
+      throw new Error('opaque access token');
     } catch {
       // Fallback: the ID token. The API verifies it against Auth0's JWKS with
       // the SPA client id as the audience, so this is still a real identity

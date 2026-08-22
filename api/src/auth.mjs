@@ -65,6 +65,16 @@ export async function authenticate(req) {
 
   if (!token) throw new AuthError('unauthenticated', 'Missing bearer token.');
 
+  // Auth0 issues an OPAQUE access token when the SPA requests no audience.
+  // getAccessTokenSilently() resolves happily with it, so the client cannot
+  // tell it failed — but it is not a JWT and will never verify. Say so plainly.
+  if (token.split('.').length !== 3) {
+    throw new AuthError(
+      'unauthenticated',
+      'Received an opaque Auth0 token, not a JWT. Register an API in Auth0 and set AUTH0_AUDIENCE / VITE_AUTH0_AUDIENCE.',
+    );
+  }
+
   try {
     const accepted = [audience, clientId].filter(Boolean);
     const { payload } = await jwtVerify(token, getJwks(), {
@@ -77,7 +87,11 @@ export async function authenticate(req) {
     return { userId: String(payload.sub), claims: payload };
   } catch (err) {
     if (err instanceof AuthError) throw err;
-    throw new AuthError('unauthenticated', 'Token verification failed.');
+    // Log the real reason server-side: 'Token verification failed' on its own
+    // is useless when the cause is an opaque token, a clock skew, or an
+    // audience mismatch.
+    console.warn('[auth] rejected token:', err.code ?? err.name, '-', err.message);
+    throw new AuthError('unauthenticated', `Token rejected: ${err.message}`);
   }
 }
 

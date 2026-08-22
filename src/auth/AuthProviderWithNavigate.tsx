@@ -35,6 +35,16 @@ export function AuthProviderWithNavigate({ children }: PropsWithChildren) {
     navigate('/', { replace: true });
   };
 
+  /**
+   * Enable Banking returns the user to /callback with ?code=&state= — the exact
+   * query parameters the Auth0 SPA SDK watches for on every page load. Without
+   * this, Auth0 grabs the BANK's authorisation code, tries to exchange it for
+   * an Auth0 token, fails, and shows "We couldn't verify your session".
+   *
+   * skipRedirectCallback tells Auth0 that this one route is not its business.
+   */
+  const isBankCallback = window.location.pathname === '/callback';
+
   return (
     <Auth0Provider
       domain={domain}
@@ -44,6 +54,7 @@ export function AuthProviderWithNavigate({ children }: PropsWithChildren) {
         ...(audience ? { audience } : {}),
       }}
       onRedirectCallback={handleRedirect}
+      skipRedirectCallback={isBankCallback}
     >
       {children}
     </Auth0Provider>

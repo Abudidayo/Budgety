@@ -61,7 +61,7 @@ export function SettingsPage() {
             Disconnect bank
           </button>
         ) : (
-          <button type="button" className="settings-manage-pill" onClick={() => navigate('/connect')}>
+          <button type="button" className="settings-connect" onClick={() => navigate('/connect')}>
             Connect a bank
           </button>
         )}

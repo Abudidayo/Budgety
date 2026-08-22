@@ -313,3 +313,8 @@ button {
 .legal-page p, .legal-page li { font-size: 14.5px; line-height: 1.6; color: var(--ink-soft); }
 .legal-page ul { padding-left: 20px; margin-bottom: 8px; }
 .legal-page a { color: var(--leaf-deep); }
+
+.settings-connect {
+  width: 100%; border: 0; border-radius: 999px; padding: 13px 0; margin-top: 12px;
+  background: var(--ink); color: #fff; font-weight: 800; font-size: 14.5px;
+}

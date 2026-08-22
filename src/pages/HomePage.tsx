@@ -37,11 +37,11 @@ function txSubline(t: Transaction): string {
 }
 
 export function HomePage() {
-  const { period, setPeriod, account } = useApp();
+  const { period, setPeriod, account, transactions } = useApp();
 
-  const txs = visibleTransactions(period, account);
+  const txs = visibleTransactions(transactions, period, account);
   const review = needsReview(txs);
-  const monthTxs = visibleTransactions('month', account);
+  const monthTxs = visibleTransactions(transactions, 'month', account);
   const insight = heroInsight(categorySummaries(monthTxs));
 
   return (

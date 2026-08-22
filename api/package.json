@@ -1,0 +1,13 @@
+{
+  "name": "budgety-api",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs"
+  },
+  "dependencies": {
+    "jose": "^5.9.6"
+  }
+}

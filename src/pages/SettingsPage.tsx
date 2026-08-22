@@ -1,11 +1,21 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { getDisplayName } from '../auth/userName';
-import { ACCOUNTS } from '../data/fixtures';
+import { useState } from 'react';
+import { BankPicker } from '../components/BankPicker';
 import { formatGBP } from '../data/selectors';
+import { useApp } from '../state/AppContext';
 import './SettingsPage.css';
 
 export function SettingsPage() {
   const { logout, user } = useAuth0();
+  const { accounts, bankName, disconnect } = useApp();
+  const [picking, setPicking] = useState(false);
+
+  const handleDisconnect = async () => {
+    await disconnect();
+    // Stay on Settings — this is where reconnecting happens.
+    setPicking(false);
+  };
 
   const handleLogout = () => {
     void logout({
@@ -29,13 +39,12 @@ export function SettingsPage() {
 
       <div className="card settings-accounts">
         <p className="settings-accounts-label">Connected accounts</p>
-        {ACCOUNTS.length === 0 && (
-          <p className="settings-accounts-empty">
-            No accounts connected yet.
-          </p>
+        {accounts.length === 0 && (
+          <p className="settings-accounts-empty">No accounts connected yet.</p>
         )}
+        {bankName && <p className="settings-accounts-empty">via {bankName}</p>}
         <ul className="settings-accounts-list">
-          {ACCOUNTS.map((account) => (
+          {accounts.map((account) => (
             <li key={account.id} className="settings-account-row">
               <div className="settings-account-info">
                 <span className="settings-account-name">{account.name}</span>
@@ -49,6 +58,17 @@ export function SettingsPage() {
             </li>
           ))}
         </ul>
+        {picking ? (
+          <BankPicker onCancel={() => setPicking(false)} />
+        ) : accounts.length > 0 ? (
+          <button type="button" className="settings-logout" onClick={() => void handleDisconnect()}>
+            Disconnect bank
+          </button>
+        ) : (
+          <button type="button" className="settings-connect" onClick={() => setPicking(true)}>
+            Connect a bank
+          </button>
+        )}
       </div>
 
       <div className="card settings-profile">

@@ -1,6 +1,11 @@
 export type Period = 'week' | 'fortnight' | 'month';
 
-export type AccountId = 'monzo' | 'barclays' | 'amex';
+/**
+ * Provider account identifier. A string, not a union: real accounts have
+ * opaque uids assigned by the bank, and we only ever show accounts the user
+ * actually connected.
+ */
+export type AccountId = string;
 
 export interface Account {
   id: AccountId;

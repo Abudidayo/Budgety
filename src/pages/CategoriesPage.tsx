@@ -9,8 +9,11 @@ import {
 import './CategoriesPage.css';
 
 export function CategoriesPage() {
-  const { period, account } = useApp();
-  const txs = useMemo(() => visibleTransactions(period, account), [period, account]);
+  const { period, account, transactions } = useApp();
+  const txs = useMemo(
+    () => visibleTransactions(transactions, period, account),
+    [transactions, period, account],
+  );
   const summaries = useMemo(() => categorySummaries(txs), [txs]);
   const review = useMemo(() => needsReview(txs), [txs]);
 

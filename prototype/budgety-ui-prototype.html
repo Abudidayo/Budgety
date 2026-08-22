@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<!--
+  PROTOTYPE — throwaway, do not ship.
+  Four variants of the Budgety mobile dashboard (Linear ABU-20 / ABU-23),
+  switchable via ?variant=A|B|C|D and the floating bar at the bottom.
+  Style brief: "meow manager"-like, pastel light green, cat mascot.
+  Open this file directly in a browser. Arrow keys ← → also switch variants.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Budgety — UI prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Gochi+Hand&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --mint-bg:#EAF6EC;
+    --mint-soft:#D6EEDA;
+    --leaf:#8FCB9B;
+    --leaf-deep:#5FA873;
+    --ink:#2E5339;
+    --ink-soft:#5C7A66;
+    --card:#FFFFFF;
+    --peach:#FFD9A8;
+    --peach-deep:#C97F2E;
+    --rose:#F6C6C6;
+    --rose-deep:#B85B5B;
+    --radius:22px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:'Nunito',sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #DFF3E2 0%, transparent 60%),
+      radial-gradient(900px 500px at 10% 110%, #E3F4E6 0%, transparent 55%),
+      #F2F9F3;
+    min-height:100vh;
+  }
+  .stage{display:flex;justify-content:center;padding:32px 0 110px}
+  .phone{
+    width:390px;max-width:100%;
+    min-height:780px;
+    background:var(--mint-bg);
+    border-radius:36px;
+    box-shadow:0 24px 60px rgba(46,83,57,.18), 0 2px 0 rgba(255,255,255,.8) inset;
+    overflow:hidden;
+    position:relative;
+  }
+  @media (max-width:430px){
+    .stage{padding:0 0 96px}
+    .phone{border-radius:0;min-height:100vh;box-shadow:none}
+  }
+  .variant{display:none}
+  .variant.active{display:block}
+  h1,h2,h3,.display{font-family:'Baloo 2',cursive}
+  button{font-family:inherit;cursor:pointer}
+  :focus-visible{outline:3px solid var(--leaf-deep);outline-offset:2px;border-radius:8px}
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
+
+  /* ============ shared cat ============ */
+  .cat{display:inline-block;line-height:1}
+
+  /* ================================================================
+     VARIANT A — "Meadow": bubbly cards, speech-bubble hero, tab bar
+     ================================================================ */
+  .va{padding:22px 18px 96px;background:var(--mint-bg)}
+  .va-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .va-hi{font-size:14px;color:var(--ink-soft);font-weight:700}
+  .va-name{font-family:'Baloo 2';font-size:24px;font-weight:700;line-height:1.1}
+  .va-avatar{width:52px;height:52px;border-radius:50%;background:var(--leaf);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 0 #78B586}
+  .va-hero{position:relative;margin-bottom:26px}
+  .va-bubble{
+    background:var(--card);border-radius:26px 26px 26px 6px;
+    padding:18px 20px;box-shadow:0 8px 24px rgba(46,83,57,.10);
+    font-size:15.5px;line-height:1.5;font-weight:600;
+  }
+  .va-bubble strong{color:var(--peach-deep)}
+  .va-bubble-meta{margin-top:8px;font-size:12px;color:var(--ink-soft);font-weight:700}
+  .va-cat-row{display:flex;align-items:flex-end;gap:8px;margin-top:6px;padding-left:8px}
+  .va-cat-row .cat{font-size:34px;transform:scaleX(-1)}
+  .va-cat-row span:last-child{font-size:12px;color:var(--ink-soft);font-weight:700;margin-bottom:6px}
+  .va-period{display:flex;gap:8px;margin-bottom:18px}
+  .va-period button{
+    flex:1;border:0;border-radius:999px;padding:9px 0;font-weight:800;font-size:13px;
+    background:#DCEFDF;color:var(--ink-soft);
+  }
+  .va-period button[aria-pressed="true"]{background:var(--ink);color:#fff}
+  .va-sec{font-family:'Baloo 2';font-size:17px;font-weight:700;margin:0 0 12px;display:flex;justify-content:space-between;align-items:baseline}
+  .va-sec a{font-family:'Nunito';font-size:12.5px;font-weight:800;color:var(--leaf-deep);text-decoration:none}
+  .va-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:26px}
+  .va-card{
+    background:var(--card);border-radius:var(--radius);padding:14px;
+    box-shadow:0 4px 14px rgba(46,83,57,.07);
+  }
+  .va-card .em{font-size:22px}
+  .va-card .nm{font-weight:800;font-size:13.5px;margin-top:6px}
+  .va-card .amt{font-size:12px;color:var(--ink-soft);font-weight:700;margin:2px 0 8px}
+  .va-bar{height:8px;border-radius:99px;background:#E4F1E6;overflow:hidden}
+  .va-bar i{display:block;height:100%;border-radius:99px;background:var(--leaf)}
+  .va-card.warn .va-bar i{background:var(--peach)}
+  .va-card.over .va-bar i{background:var(--rose)}
+  .va-card.over .amt{color:var(--rose-deep)}
+  .va-review{
+    background:linear-gradient(120deg,#FFF6E8,#FFEFD6);border-radius:var(--radius);
+    padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:26px;
+  }
+  .va-review .t{font-size:13.5px;font-weight:700;line-height:1.35}
+  .va-review .t b{display:block;font-size:14px}
+  .va-review button{margin-left:auto;border:0;background:var(--ink);color:#fff;border-radius:999px;padding:8px 14px;font-weight:800;font-size:12px;white-space:nowrap}
+  .va-tx{background:var(--card);border-radius:var(--radius);padding:6px 16px;box-shadow:0 4px 14px rgba(46,83,57,.07)}
+  .va-tx-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #EFF6F0}
+  .va-tx-row:last-child{border-bottom:0}
+  .va-tx-ic{width:38px;height:38px;border-radius:14px;background:var(--mint-soft);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+  .va-tx-nm{font-weight:800;font-size:13.5px}
+  .va-tx-cat{font-size:11.5px;color:var(--ink-soft);font-weight:700}
+  .va-tx-amt{margin-left:auto;font-weight:800;font-size:13.5px}
+  .va-tabs{
+    position:absolute;left:16px;right:16px;bottom:14px;
+    background:var(--ink);border-radius:999px;display:flex;justify-content:space-around;
+    padding:10px 8px;box-shadow:0 10px 24px rgba(46,83,57,.35);
+  }
+  .va-tabs button{background:none;border:0;color:#A9CBB2;font-size:19px;padding:4px 14px;border-radius:999px}
+  .va-tabs button.on{background:var(--leaf);color:var(--ink)}
+
+  /* ================================================================
+     VARIANT B — "Ledger": quiet list-first, dense rows, day groups
+     ================================================================ */
+  .vb{background:#FBFDFB;min-height:780px;padding-bottom:40px}
+  .vb-head{background:var(--mint-soft);padding:22px 20px 18px;border-radius:0 0 28px 28px;position:relative}
+  .vb-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .vb-acct{position:relative;flex:none}
+  .vb-acct-btn{
+    display:flex;align-items:center;gap:8px;border:0;background:#fff;border-radius:999px;
+    padding:8px 12px;font-weight:800;font-size:12.5px;color:var(--ink);
+    box-shadow:0 2px 8px rgba(46,83,57,.10);
+  }
+  .vb-acct-btn .dot{width:18px;height:12px;border-radius:3px;background:linear-gradient(120deg,var(--leaf-deep),#8FCB9B);flex:none}
+  .vb-acct-btn .chev{font-size:10px;color:var(--ink-soft);transition:transform .15s}
+  .vb-acct-btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .vb-acct-panel{
+    display:none;position:absolute;right:0;top:calc(100% + 8px);width:240px;z-index:20;
+    background:#fff;border-radius:16px;box-shadow:0 14px 34px rgba(46,83,57,.20);padding:6px;
+  }
+  .vb-acct-panel.open{display:block}
+  .vb-acct-row{
+    display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;
+    padding:10px;border-radius:12px;text-align:left;
+  }
+  .vb-acct-row:hover{background:#F1F8F2}
+  .vb-acct-row .cardic{width:30px;height:20px;border-radius:5px;flex:none}
+  .vb-acct-row .nm{font-weight:800;font-size:13px}
+  .vb-acct-row .bal{font-size:11.5px;color:var(--ink-soft);font-weight:700}
+  .vb-acct-row .tick{margin-left:auto;font-size:13px;color:var(--leaf-deep);visibility:hidden}
+  .vb-acct-row.sel .tick{visibility:visible}
+  .vb-tabs{display:flex;gap:8px;padding:14px 20px 0}
+  .vb-tab{
+    border:0;background:#EDF5EE;color:var(--ink-soft);border-radius:999px;
+    padding:8px 18px;font-weight:800;font-size:13px;
+  }
+  .vb-tab[aria-pressed="true"]{background:var(--ink);color:#fff}
+  .vb-total-label{font-size:12px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.08em}
+  .vb-total{font-family:'Baloo 2';font-size:40px;font-weight:800;line-height:1.1}
+  .vb-total small{font-size:16px;color:var(--ink-soft);font-weight:600}
+  .vb-seg{display:flex;background:#fff;border-radius:12px;padding:4px;margin-top:14px}
+  .vb-seg button{flex:1;border:0;background:none;border-radius:9px;padding:7px 0;font-weight:800;font-size:12.5px;color:var(--ink-soft)}
+  .vb-seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+  .vb-insight{
+    margin:16px 20px;padding:12px 14px;border-left:4px solid var(--leaf-deep);
+    background:#F1F8F2;border-radius:8px;font-size:13.5px;line-height:1.5;font-weight:600;
+  }
+  .vb-insight b{color:var(--rose-deep)}
+  .vb-h{padding:10px 20px 8px;font-size:12px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.08em;display:flex;justify-content:space-between}
+  .vb-h span:last-child{letter-spacing:0;text-transform:none}
+  .vb-cats{padding:0 20px}
+  .vb-crow{display:grid;grid-template-columns:26px 1fr auto;gap:0 10px;align-items:center;padding:9px 0;border-bottom:1px dashed #E3EDE4}
+  .vb-crow:last-child{border-bottom:0}
+  .vb-crow .em{font-size:16px}
+  .vb-crow .nm{font-weight:800;font-size:13.5px}
+  .vb-crow .amt{font-size:13px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+  .vb-crow .amt small{color:var(--ink-soft);font-weight:600}
+  .vb-line{grid-column:2/4;height:4px;border-radius:99px;background:#ECF4ED;margin-top:5px;overflow:hidden}
+  .vb-line i{display:block;height:100%;background:var(--leaf-deep)}
+  .vb-crow.warn .vb-line i{background:var(--peach-deep)}
+  .vb-crow.over .vb-line i{background:var(--rose-deep)}
+  .vb-crow.over .amt{color:var(--rose-deep)}
+  .vb-day{padding:14px 20px 6px;font-size:12px;font-weight:800;color:var(--ink-soft)}
+  .vb-tx{display:flex;align-items:baseline;gap:10px;padding:8px 20px;font-size:13.5px}
+  .vb-tx:hover{background:#F4FAF5}
+  .vb-tx .nm{font-weight:700}
+  .vb-tx .cat{font-size:11.5px;color:var(--ink-soft);font-weight:700}
+  .vb-tx .cat.unk{color:var(--peach-deep);background:#FFF3E0;padding:1px 8px;border-radius:99px}
+  .vb-tx .amt{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums}
+
+  .va .vbs-card{margin:16px 0 0}
+  /* ---- Statistics cards (used on variant A's Statistics page) ---- */
+  .vbs-card{margin:16px 20px 0;background:#fff;border-radius:18px;padding:16px;box-shadow:0 4px 14px rgba(46,83,57,.07)}
+  .vbs-title{font-size:12px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+  .vbs-pie-wrap{display:flex;align-items:center;gap:18px}
+  .vbs-pie{
+    width:132px;height:132px;border-radius:50%;flex:none;
+    background:conic-gradient(
+      #5FA873 0 27%,
+      #E89A9A 27% 50%,
+      #F0B860 50% 62%,
+      #7FA8C9 62% 71%,
+      #B69AD6 71% 79%,
+      #A98B6F 79% 84%,
+      #6FBFB5 84% 88.5%,
+      #E8C86A 88.5% 93.5%,
+      #D687B0 93.5% 96.5%,
+      #93B54A 96.5% 100%
+    );
+    display:flex;align-items:center;justify-content:center;
+  }
+  .vbs-pie-in{width:74px;height:74px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .vbs-pie-in b{font-family:'Baloo 2';font-size:17px}
+  .vbs-pie-in span{font-size:9.5px;font-weight:800;color:var(--ink-soft)}
+  .vbs-legend{display:grid;grid-template-columns:1fr;gap:5px;flex:1;min-width:0}
+  .vbs-legend div{display:flex;align-items:baseline;gap:7px;font-size:12px;font-weight:700}
+  .vbs-legend i{width:9px;height:9px;border-radius:3px;flex:none;align-self:center}
+  .vbs-legend .amt{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+  .vbs-flow{display:flex;flex-direction:column;gap:10px}
+  .vbs-flow-row{display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:10px;font-size:12.5px;font-weight:800}
+  .vbs-flow-bar{height:14px;border-radius:99px;background:#EFF6F0;overflow:hidden}
+  .vbs-flow-bar i{display:block;height:100%;border-radius:99px}
+  .vbs-flow-row.inc i{background:var(--leaf-deep)}
+  .vbs-flow-row.exp i{background:#E89A9A}
+  .vbs-flow-note{font-size:12px;color:var(--ink-soft);font-weight:700;margin-top:8px}
+  .vbs-cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:10px;font-weight:800;color:var(--ink-soft);text-align:center;margin-bottom:4px}
+  .vbs-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .vbs-day{
+    aspect-ratio:1;border-radius:9px;background:#F2F8F3;
+    display:flex;align-items:center;justify-content:center;
+    font-size:10.5px;font-weight:800;color:var(--ink);position:relative;
+  }
+  .vbs-day.blank{background:none}
+  .vbs-day.s1{background:#F8E3E3}
+  .vbs-day.s2{background:#F2C4C4}
+  .vbs-day.s3{background:#E89A9A;color:#fff}
+  .vbs-day.inc::after{content:"";position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:var(--leaf-deep)}
+  .vbs-day.future{opacity:.35}
+  .vbs-day.today{outline:2px solid var(--ink);outline-offset:1px}
+  .vbs-cal-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;font-size:11px;font-weight:800;color:var(--ink-soft)}
+  .vbs-cal-legend span{display:flex;align-items:center;gap:5px}
+  .vbs-cal-legend i{width:10px;height:10px;border-radius:3px}
+  .vbs-cal-legend .d{width:6px;height:6px;border-radius:50%;background:var(--leaf-deep)}
+
+  /* ================================================================
+     VARIANT C — "Ring": chart-centric, cat inside the budget ring
+     ================================================================ */
+  .vc{background:linear-gradient(180deg,#DFF2E2 0%,var(--mint-bg) 45%);padding:22px 0 40px;min-height:780px}
+  .vc-top{display:flex;justify-content:space-between;align-items:center;padding:0 20px;margin-bottom:8px}
+  .vc-month{font-family:'Baloo 2';font-weight:700;font-size:18px;display:flex;align-items:center;gap:10px}
+  .vc-month button{border:0;background:#fff;width:28px;height:28px;border-radius:50%;font-size:13px;color:var(--ink);box-shadow:0 2px 6px rgba(46,83,57,.12)}
+  .vc-bell{border:0;background:#fff;width:38px;height:38px;border-radius:50%;font-size:16px;box-shadow:0 2px 6px rgba(46,83,57,.12)}
+  .vc-ringwrap{display:flex;justify-content:center;margin:14px 0 6px}
+  .vc-ring{
+    width:230px;height:230px;border-radius:50%;
+    background:conic-gradient(var(--leaf-deep) 0 68%, var(--peach) 68% 79%, #FFFFFF 79% 100%);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 14px 34px rgba(46,83,57,.16);
+  }
+  .vc-ring-in{
+    width:176px;height:176px;border-radius:50%;background:var(--mint-bg);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  }
+  .vc-ring-in .cat{font-size:34px}
+  .vc-spent{font-family:'Baloo 2';font-size:28px;font-weight:800;line-height:1}
+  .vc-of{font-size:12px;color:var(--ink-soft);font-weight:700}
+  .vc-legend{display:flex;justify-content:center;gap:16px;font-size:11.5px;font-weight:800;color:var(--ink-soft);margin-bottom:14px}
+  .vc-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+  .vc-hero{
+    margin:0 20px 20px;background:#fff;border-radius:18px;padding:14px 16px;
+    font-size:13.5px;line-height:1.5;font-weight:600;box-shadow:0 6px 18px rgba(46,83,57,.08);
+    display:flex;gap:10px;
+  }
+  .vc-hero .cat{font-size:20px;flex:none}
+  .vc-hero b{color:var(--peach-deep)}
+  .vc-sec{font-family:'Baloo 2';font-size:16px;font-weight:700;padding:0 20px;margin-bottom:10px}
+  .vc-scroll{display:flex;gap:12px;overflow-x:auto;padding:2px 20px 14px;scrollbar-width:none}
+  .vc-scroll::-webkit-scrollbar{display:none}
+  .vc-chip{
+    flex:none;width:128px;background:#fff;border-radius:18px;padding:12px;
+    box-shadow:0 4px 12px rgba(46,83,57,.07);
+  }
+  .vc-chip .em{font-size:20px}
+  .vc-chip .nm{font-weight:800;font-size:12.5px;margin-top:5px}
+  .vc-chip .amt{font-size:11.5px;color:var(--ink-soft);font-weight:700;margin:1px 0 7px}
+  .vc-chip .va-bar{height:6px}
+  .vc-chip.over .amt{color:var(--rose-deep)}
+  .vc-chip.over .va-bar i{background:var(--rose)}
+  .vc-chip.warn .va-bar i{background:var(--peach)}
+  .vc-tl{margin:6px 20px 0;position:relative;padding-left:18px}
+  .vc-tl::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:#CDE7D2;border-radius:2px}
+  .vc-tl-row{position:relative;display:flex;align-items:baseline;gap:10px;padding:7px 0;font-size:13.5px}
+  .vc-tl-row::before{content:"";position:absolute;left:-17px;top:13px;width:8px;height:8px;border-radius:50%;background:var(--leaf-deep)}
+  .vc-tl-row.unk::before{background:var(--peach-deep)}
+  .vc-tl-row .nm{font-weight:800}
+  .vc-tl-row .cat{font-size:11.5px;color:var(--ink-soft);font-weight:700}
+  .vc-tl-row .amt{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums}
+
+  /* ================================================================
+     VARIANT D — "Sticker": chunky borders, tilt, handwritten accents
+     ================================================================ */
+  .vd{background:#F4FAEF;padding:24px 18px 48px;min-height:780px}
+  .vd *{--b:#2E5339}
+  .vd-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .vd-logo{font-family:'Baloo 2';font-weight:800;font-size:22px;letter-spacing:.01em;display:flex;align-items:center;gap:8px}
+  .vd-logo .cat{font-size:24px;transform:rotate(-8deg)}
+  .vd-month{font-family:'Gochi Hand';font-size:16px;background:#fff;border:2px solid var(--b);border-radius:12px;padding:5px 12px;box-shadow:3px 3px 0 var(--b)}
+  .vd-hero{
+    background:#CBEAC6;border:2.5px solid var(--b);border-radius:20px;
+    padding:18px;box-shadow:5px 5px 0 var(--b);margin-bottom:24px;position:relative;
+  }
+  .vd-hero .stamp{
+    position:absolute;top:-12px;right:14px;transform:rotate(6deg);
+    font-family:'Gochi Hand';font-size:14px;background:var(--peach);
+    border:2px solid var(--b);border-radius:10px;padding:3px 10px;box-shadow:2px 2px 0 var(--b);
+  }
+  .vd-hero p{font-size:15px;line-height:1.5;font-weight:700}
+  .vd-hero p b{background:#fff;border-radius:6px;padding:0 5px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  .vd-hero .paw{font-family:'Gochi Hand';font-size:13px;margin-top:10px;color:#456B50}
+  .vd-sec{font-family:'Gochi Hand';font-size:20px;margin:0 0 14px;transform:rotate(-1.2deg);display:inline-block;background:#fff;border:2px solid var(--b);border-radius:10px;padding:3px 14px;box-shadow:3px 3px 0 var(--b)}
+  .vd-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:26px}
+  .vd-card{
+    background:#fff;border:2.5px solid var(--b);border-radius:16px;padding:12px;
+    box-shadow:4px 4px 0 var(--b);
+  }
+  .vd-card:nth-child(odd){transform:rotate(-.7deg)}
+  .vd-card:nth-child(even){transform:rotate(.7deg)}
+  .vd-card .em{font-size:22px}
+  .vd-card .nm{font-weight:800;font-size:13.5px;margin-top:4px}
+  .vd-card .amt{font-family:'Gochi Hand';font-size:14px;margin:2px 0 7px}
+  .vd-bar{height:10px;border:2px solid var(--b);border-radius:99px;overflow:hidden;background:#fff}
+  .vd-bar i{display:block;height:100%;background:repeating-linear-gradient(-45deg,var(--leaf) 0 6px,#A9DBB3 6px 12px)}
+  .vd-card.warn .vd-bar i{background:repeating-linear-gradient(-45deg,var(--peach) 0 6px,#FFE6C4 6px 12px)}
+  .vd-card.over{background:#FDEEEE}
+  .vd-card.over .vd-bar i{background:repeating-linear-gradient(-45deg,#E89A9A 0 6px,var(--rose) 6px 12px)}
+  .vd-card.over .amt{color:var(--rose-deep)}
+  .vd-tx{background:#fff;border:2.5px solid var(--b);border-radius:16px;box-shadow:4px 4px 0 var(--b);padding:4px 14px}
+  .vd-tx-row{display:flex;align-items:baseline;gap:10px;padding:11px 0;border-bottom:2px dotted #C9DECB;font-size:13.5px}
+  .vd-tx-row:last-child{border-bottom:0}
+  .vd-tx-row .nm{font-weight:800}
+  .vd-tx-row .cat{font-family:'Gochi Hand';font-size:13px;color:#456B50}
+  .vd-tx-row .cat.unk{color:var(--peach-deep)}
+  .vd-tx-row .amt{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums}
+
+  /* ============ floating prototype switcher (not part of designs) ============ */
+  .proto-bar{
+    position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+    background:#17251B;color:#fff;border-radius:999px;
+    display:flex;align-items:center;gap:4px;padding:6px;
+    box-shadow:0 12px 32px rgba(0,0,0,.35);z-index:99;
+    font-family:'Nunito',sans-serif;
+  }
+  .proto-bar button{
+    border:0;background:#2E4636;color:#fff;width:36px;height:36px;border-radius:50%;
+    font-size:15px;
+  }
+  .proto-bar button:hover{background:#3E5C48}
+  .proto-label{min-width:190px;text-align:center;font-weight:800;font-size:13px;padding:0 6px}
+  .proto-label small{display:block;font-weight:600;color:#9FBFA9;font-size:11px}
+</style>
+</head>
+<body>
+<div class="stage"><div class="phone">
+
+<!-- ================= VARIANT A : Meadow ================= -->
+<section class="variant" id="v-A" aria-label="Variant A — Meadow">
+  <div class="va">
+    <div class="va-top">
+      <div>
+        <div class="va-hi">Good afternoon 🌿</div>
+        <div class="va-name">Hey, Abdullah</div>
+      </div>
+      <div class="vb-acct">
+        <button class="vb-acct-btn" aria-expanded="false">
+          <span class="dot"></span><span class="vb-acct-name-lbl">All accounts</span><span class="chev">▼</span>
+        </button>
+        <div class="vb-acct-panel">
+          <button class="vb-acct-row sel" data-name="All accounts">
+            <span class="cardic" style="background:linear-gradient(120deg,var(--leaf-deep),#8FCB9B)"></span>
+            <span><span class="nm">All accounts</span><br><span class="bal">3 connected</span></span>
+            <span class="tick">✓</span>
+          </button>
+          <button class="vb-acct-row" data-name="Monzo">
+            <span class="cardic" style="background:linear-gradient(120deg,#FF6B6B,#FFB86B)"></span>
+            <span><span class="nm">Monzo · Current</span><br><span class="bal">£1,204.20</span></span>
+            <span class="tick">✓</span>
+          </button>
+          <button class="vb-acct-row" data-name="Barclays">
+            <span class="cardic" style="background:linear-gradient(120deg,#4A90D9,#7FB3E8)"></span>
+            <span><span class="nm">Barclays · Student</span><br><span class="bal">£310.55</span></span>
+            <span class="tick">✓</span>
+          </button>
+          <button class="vb-acct-row" data-name="Amex">
+            <span class="cardic" style="background:linear-gradient(120deg,#2E5339,#5C7A66)"></span>
+            <span><span class="nm">Amex · Credit</span><br><span class="bal">−£86.10</span></span>
+            <span class="tick">✓</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="va-page" id="va-home">
+      <div class="va-review">
+        <span style="font-size:22px">🕵️</span>
+        <div class="t"><b>3 purchases need a look</b>Mochi couldn't tell what "PAYPAL *WRLD" was.</div>
+        <button>Review</button>
+      </div>
+
+      <div class="va-hero">
+        <div class="va-bubble">
+          You've spent <strong>£142 on eating out</strong> this month — that's £22 over budget, your biggest jump since July. Groceries are looking great though!
+        </div>
+      </div>
+
+      <div class="va-period" role="group" aria-label="Period">
+        <button aria-pressed="false">Weekly</button>
+        <button aria-pressed="false">2 weeks</button>
+        <button aria-pressed="true">Monthly</button>
+      </div>
+
+      <h2 class="va-sec">Transactions <a href="#">See all</a></h2>
+      <div class="va-tx">
+        <div class="va-tx-row"><div class="va-tx-ic">🛒</div><div><div class="va-tx-nm">Tesco Express</div><div class="va-tx-cat">Groceries · Today</div></div><div class="va-tx-amt">−£12.40</div></div>
+        <div class="va-tx-row"><div class="va-tx-ic">🍜</div><div><div class="va-tx-nm">Wagamama</div><div class="va-tx-cat">Eating out · Today</div></div><div class="va-tx-amt">−£18.90</div></div>
+        <div class="va-tx-row"><div class="va-tx-ic">❓</div><div><div class="va-tx-nm">PAYPAL *WRLD</div><div class="va-tx-cat" style="color:var(--peach-deep)">Needs review · Yesterday</div></div><div class="va-tx-amt">−£9.99</div></div>
+        <div class="va-tx-row"><div class="va-tx-ic">🚇</div><div><div class="va-tx-nm">TfL Travel</div><div class="va-tx-cat">Transport · Yesterday</div></div><div class="va-tx-amt">−£5.60</div></div>
+        <div class="va-tx-row"><div class="va-tx-ic">☕️</div><div><div class="va-tx-nm">Pret a Manger</div><div class="va-tx-cat">Coffee · Yesterday</div></div><div class="va-tx-amt">−£4.15</div></div>
+        <div class="va-tx-row"><div class="va-tx-ic">📺</div><div><div class="va-tx-nm">Spotify</div><div class="va-tx-cat">Subscriptions · Wed 20 Aug</div></div><div class="va-tx-amt">−£11.99</div></div>
+      </div>
+    </div><!-- /va-home -->
+
+    <div class="va-page" id="va-cats" style="display:none">
+      <h2 class="va-sec">Your categories</h2>
+      <div class="va-grid">
+        <div class="va-card over"><span class="em">🍜</span><div class="nm">Eating out</div><div class="amt">£142 of £120</div><div class="va-bar"><i style="width:100%"></i></div></div>
+        <div class="va-card"><span class="em">🛒</span><div class="nm">Groceries</div><div class="amt">£168 of £220</div><div class="va-bar"><i style="width:76%"></i></div></div>
+        <div class="va-card warn"><span class="em">🎉</span><div class="nm">Nights out</div><div class="amt">£74 of £80</div><div class="va-bar"><i style="width:92%"></i></div></div>
+        <div class="va-card"><span class="em">🚇</span><div class="nm">Transport</div><div class="amt">£56 of £90</div><div class="va-bar"><i style="width:62%"></i></div></div>
+        <div class="va-card"><span class="em">🛍️</span><div class="nm">Shopping</div><div class="amt">£48 of £70</div><div class="va-bar"><i style="width:69%"></i></div></div>
+        <div class="va-card"><span class="em">☕️</span><div class="nm">Coffee</div><div class="amt">£31 of £40</div><div class="va-bar"><i style="width:78%"></i></div></div>
+        <div class="va-card"><span class="em">📺</span><div class="nm">Subscriptions</div><div class="amt">£27 of £35</div><div class="va-bar"><i style="width:77%"></i></div></div>
+        <div class="va-card"><span class="em">💊</span><div class="nm">Health</div><div class="amt">£19 of £45</div><div class="va-bar"><i style="width:42%"></i></div></div>
+        <div class="va-card"><span class="em">📚</span><div class="nm">Uni supplies</div><div class="amt">£14 of £50</div><div class="va-bar"><i style="width:28%"></i></div></div>
+      </div>
+    </div><!-- /va-cats -->
+
+    <div class="va-page" id="va-stats" style="display:none">
+      <h2 class="va-sec">Statistics</h2>
+      <!-- stats cards are moved in here from #stats-holding-pen on load -->
+    </div><!-- /va-stats -->
+
+    <div class="va-page" id="va-settings" style="display:none">
+      <h2 class="va-sec">Settings</h2>
+      <div class="vbs-card" style="text-align:center;padding:40px 20px">
+        <div style="font-size:34px">⚙️</div>
+        <div style="font-family:'Baloo 2';font-size:17px;font-weight:700;margin-top:8px">Settings live here soon</div>
+        <div style="font-size:13px;color:var(--ink-soft);font-weight:700;margin-top:6px;line-height:1.5">Connected accounts, budgets and notifications — placeholder for now.</div>
+      </div>
+    </div><!-- /va-settings -->
+
+    <nav class="va-tabs" aria-label="App">
+      <button class="on" data-page="va-home" aria-label="Home">🏠</button>
+      <button data-page="va-cats" aria-label="Categories">🧺</button>
+      <button data-page="va-stats" aria-label="Statistics">📊</button>
+      <button data-page="va-settings" aria-label="Settings">⚙️</button>
+    </nav>
+  </div>
+</section>
+
+<!-- ================= VARIANT B : Ledger ================= -->
+<section class="variant" id="v-B" aria-label="Variant B — Ledger">
+  <div class="vb">
+    <header class="vb-head">
+      <div class="vb-head-row">
+        <div>
+          <div class="vb-total-label">Spent in August</div>
+          <div class="vb-total">£612<small> of £790 budget</small></div>
+        </div>
+        <div class="vb-acct">
+          <button class="vb-acct-btn" id="vb-acct-btn" aria-expanded="false" aria-controls="vb-acct-panel">
+            <span class="dot"></span><span class="vb-acct-name-lbl">All accounts</span><span class="chev">▼</span>
+          </button>
+          <div class="vb-acct-panel" id="vb-acct-panel">
+            <button class="vb-acct-row sel" data-name="All accounts">
+              <span class="cardic" style="background:linear-gradient(120deg,var(--leaf-deep),#8FCB9B)"></span>
+              <span><span class="nm">All accounts</span><br><span class="bal">3 connected</span></span>
+              <span class="tick">✓</span>
+            </button>
+            <button class="vb-acct-row" data-name="Monzo">
+              <span class="cardic" style="background:linear-gradient(120deg,#FF6B6B,#FFB86B)"></span>
+              <span><span class="nm">Monzo · Current</span><br><span class="bal">£1,204.20</span></span>
+              <span class="tick">✓</span>
+            </button>
+            <button class="vb-acct-row" data-name="Barclays">
+              <span class="cardic" style="background:linear-gradient(120deg,#4A90D9,#7FB3E8)"></span>
+              <span><span class="nm">Barclays · Student</span><br><span class="bal">£310.55</span></span>
+              <span class="tick">✓</span>
+            </button>
+            <button class="vb-acct-row" data-name="Amex">
+              <span class="cardic" style="background:linear-gradient(120deg,#2E5339,#5C7A66)"></span>
+              <span><span class="nm">Amex · Credit</span><br><span class="bal">−£86.10</span></span>
+              <span class="tick">✓</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="vb-seg" role="group" aria-label="Period">
+        <button aria-pressed="false">Week</button>
+        <button aria-pressed="false">2 weeks</button>
+        <button aria-pressed="true">Month</button>
+      </div>
+    </header>
+
+    <div class="vb-page" id="vb-home">
+    <p class="vb-insight">Eating out is <b>£22 over budget</b> — your biggest jump since July. Everything else is on track, with £178 left for the month.</p>
+
+    <div class="vb-h"><span>Transactions</span><span></span></div>
+    <div class="vb-day">Today · Fri 22 Aug</div>
+    <div class="vb-tx"><span class="nm">Tesco Express</span><span class="cat">Groceries</span><span class="amt">−£12.40</span></div>
+    <div class="vb-tx"><span class="nm">Wagamama</span><span class="cat">Eating out</span><span class="amt">−£18.90</span></div>
+    <div class="vb-day">Yesterday · Thu 21 Aug</div>
+    <div class="vb-tx"><span class="nm">PAYPAL *WRLD</span><span class="cat unk">Needs review</span><span class="amt">−£9.99</span></div>
+    <div class="vb-tx"><span class="nm">TfL Travel</span><span class="cat">Transport</span><span class="amt">−£5.60</span></div>
+    <div class="vb-tx"><span class="nm">Pret a Manger</span><span class="cat">Coffee</span><span class="amt">−£4.15</span></div>
+
+    <div class="vb-h" style="margin-top:12px"><span>Categories</span><span>spent / budget</span></div>
+    <div class="vb-cats">
+      <div class="vb-crow over"><span class="em">🍜</span><span class="nm">Eating out</span><span class="amt">£142 <small>/ £120</small></span><span class="vb-line"><i style="width:100%"></i></span></div>
+      <div class="vb-crow"><span class="em">🛒</span><span class="nm">Groceries</span><span class="amt">£168 <small>/ £220</small></span><span class="vb-line"><i style="width:76%"></i></span></div>
+      <div class="vb-crow warn"><span class="em">🎉</span><span class="nm">Nights out</span><span class="amt">£74 <small>/ £80</small></span><span class="vb-line"><i style="width:92%"></i></span></div>
+      <div class="vb-crow"><span class="em">🚇</span><span class="nm">Transport</span><span class="amt">£56 <small>/ £90</small></span><span class="vb-line"><i style="width:62%"></i></span></div>
+      <div class="vb-crow"><span class="em">🛍️</span><span class="nm">Shopping</span><span class="amt">£48 <small>/ £70</small></span><span class="vb-line"><i style="width:69%"></i></span></div>
+      <div class="vb-crow"><span class="em">☕️</span><span class="nm">Coffee</span><span class="amt">£31 <small>/ £40</small></span><span class="vb-line"><i style="width:78%"></i></span></div>
+      <div class="vb-crow"><span class="em">📺</span><span class="nm">Subscriptions</span><span class="amt">£27 <small>/ £35</small></span><span class="vb-line"><i style="width:77%"></i></span></div>
+      <div class="vb-crow"><span class="em">💊</span><span class="nm">Health</span><span class="amt">£19 <small>/ £45</small></span><span class="vb-line"><i style="width:42%"></i></span></div>
+      <div class="vb-crow"><span class="em">📚</span><span class="nm">Uni supplies</span><span class="amt">£14 <small>/ £50</small></span><span class="vb-line"><i style="width:28%"></i></span></div>
+      <div class="vb-crow warn"><span class="em">❓</span><span class="nm">Needs review</span><span class="amt">£33 <small>· 3 items</small></span><span class="vb-line"><i style="width:0"></i></span></div>
+    </div>
+    </div><!-- /vb-home -->
+  </div>
+</section>
+
+<div hidden id="stats-holding-pen">
+      <div class="vbs-card">
+        <div class="vbs-title">Spending by category</div>
+        <div class="vbs-pie-wrap">
+          <div class="vbs-pie" role="img" aria-label="Spending split by category, £612 total">
+            <div class="vbs-pie-in"><b>£612</b><span>AUGUST</span></div>
+          </div>
+          <div class="vbs-legend">
+            <div><i style="background:#5FA873"></i>Groceries<span class="amt">£168</span></div>
+            <div><i style="background:#E89A9A"></i>Eating out<span class="amt">£142</span></div>
+            <div><i style="background:#F0B860"></i>Nights out<span class="amt">£74</span></div>
+            <div><i style="background:#7FA8C9"></i>Transport<span class="amt">£56</span></div>
+            <div><i style="background:#B69AD6"></i>Shopping<span class="amt">£48</span></div>
+            <div><i style="background:#A98B6F"></i>Coffee<span class="amt">£31</span></div>
+            <div><i style="background:#6FBFB5"></i>Other<span class="amt">£93</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vbs-card">
+        <div class="vbs-title">Income vs spending</div>
+        <div class="vbs-flow">
+          <div class="vbs-flow-row inc"><span>Income</span><span class="vbs-flow-bar"><i style="width:100%"></i></span><span>£1,240</span></div>
+          <div class="vbs-flow-row exp"><span>Spent</span><span class="vbs-flow-bar"><i style="width:49%"></i></span><span>£612</span></div>
+        </div>
+        <div class="vbs-flow-note">You've kept £628 so far — 51% of what came in this month.</div>
+      </div>
+
+      <div class="vbs-card">
+        <div class="vbs-title">August · daily spending</div>
+        <div class="vbs-cal-head"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+        <div class="vbs-cal">
+          <span class="vbs-day blank"></span><span class="vbs-day blank"></span><span class="vbs-day blank"></span><span class="vbs-day blank"></span><span class="vbs-day blank"></span>
+          <span class="vbs-day s2 inc">1</span><span class="vbs-day s1">2</span>
+          <span class="vbs-day s1">3</span><span class="vbs-day">4</span><span class="vbs-day s1">5</span><span class="vbs-day s2">6</span><span class="vbs-day s3">7</span><span class="vbs-day s2">8</span><span class="vbs-day s1">9</span>
+          <span class="vbs-day">10</span><span class="vbs-day s1">11</span><span class="vbs-day s1">12</span><span class="vbs-day">13</span><span class="vbs-day s2">14</span><span class="vbs-day s3 inc">15</span><span class="vbs-day s2">16</span>
+          <span class="vbs-day s1">17</span><span class="vbs-day">18</span><span class="vbs-day s1">19</span><span class="vbs-day s2">20</span><span class="vbs-day s1">21</span><span class="vbs-day s1 today">22</span><span class="vbs-day future">23</span>
+          <span class="vbs-day future">24</span><span class="vbs-day future">25</span><span class="vbs-day future">26</span><span class="vbs-day future">27</span><span class="vbs-day future">28</span><span class="vbs-day future">29</span><span class="vbs-day future">30</span>
+          <span class="vbs-day future">31</span>
+        </div>
+        <div class="vbs-cal-legend">
+          <span><i style="background:#F2F8F3"></i>£0</span>
+          <span><i style="background:#F8E3E3"></i>Under £10</span>
+          <span><i style="background:#F2C4C4"></i>£10–30</span>
+          <span><i style="background:#E89A9A"></i>£30+</span>
+          <span><span class="d"></span>Income day</span>
+        </div>
+      </div>
+</div><!-- /stats-holding-pen -->
+
+<!-- ================= VARIANT C : Ring ================= -->
+<section class="variant" id="v-C" aria-label="Variant C — Ring">
+  <div class="vc">
+    <div class="vc-top">
+      <div class="vc-month"><button aria-label="Previous month">‹</button> August <button aria-label="Next month">›</button></div>
+      <button class="vc-bell" aria-label="Notifications">🔔</button>
+    </div>
+
+    <div class="vc-ringwrap">
+      <div class="vc-ring" role="img" aria-label="£612 spent of £790 budget">
+        <div class="vc-ring-in">
+          <span class="cat">🐱</span>
+          <div class="vc-spent">£612</div>
+          <div class="vc-of">of £790 · £178 left</div>
+        </div>
+      </div>
+    </div>
+    <div class="vc-legend">
+      <span><i style="background:var(--leaf-deep)"></i>On budget</span>
+      <span><i style="background:var(--peach)"></i>Over</span>
+      <span><i style="background:#fff;border:1px solid #CDE7D2"></i>Remaining</span>
+    </div>
+
+    <div class="vc-hero"><span class="cat">💬</span><span>Heads up — <b>eating out is £22 over budget</b>, your biggest jump since July. Skip two takeaways and you're back on track.</span></div>
+
+    <h2 class="vc-sec">Categories</h2>
+    <div class="vc-scroll">
+      <div class="vc-chip over"><span class="em">🍜</span><div class="nm">Eating out</div><div class="amt">£142 / £120</div><div class="va-bar"><i style="width:100%"></i></div></div>
+      <div class="vc-chip"><span class="em">🛒</span><div class="nm">Groceries</div><div class="amt">£168 / £220</div><div class="va-bar"><i style="width:76%"></i></div></div>
+      <div class="vc-chip warn"><span class="em">🎉</span><div class="nm">Nights out</div><div class="amt">£74 / £80</div><div class="va-bar"><i style="width:92%"></i></div></div>
+      <div class="vc-chip"><span class="em">🚇</span><div class="nm">Transport</div><div class="amt">£56 / £90</div><div class="va-bar"><i style="width:62%"></i></div></div>
+      <div class="vc-chip"><span class="em">🛍️</span><div class="nm">Shopping</div><div class="amt">£48 / £70</div><div class="va-bar"><i style="width:69%"></i></div></div>
+      <div class="vc-chip"><span class="em">☕️</span><div class="nm">Coffee</div><div class="amt">£31 / £40</div><div class="va-bar"><i style="width:78%"></i></div></div>
+    </div>
+
+    <h2 class="vc-sec" style="margin-top:8px">This week</h2>
+    <div class="vc-tl">
+      <div class="vc-tl-row"><span class="nm">Tesco Express</span><span class="cat">Groceries</span><span class="amt">−£12.40</span></div>
+      <div class="vc-tl-row"><span class="nm">Wagamama</span><span class="cat">Eating out</span><span class="amt">−£18.90</span></div>
+      <div class="vc-tl-row unk"><span class="nm">PAYPAL *WRLD</span><span class="cat">Needs review</span><span class="amt">−£9.99</span></div>
+      <div class="vc-tl-row"><span class="nm">TfL Travel</span><span class="cat">Transport</span><span class="amt">−£5.60</span></div>
+      <div class="vc-tl-row"><span class="nm">Spotify</span><span class="cat">Subscriptions</span><span class="amt">−£11.99</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VARIANT D : Sticker ================= -->
+<section class="variant" id="v-D" aria-label="Variant D — Sticker">
+  <div class="vd">
+    <div class="vd-head">
+      <div class="vd-logo"><span class="cat">🐱</span> budgety</div>
+      <div class="vd-month">Aug ▾</div>
+    </div>
+
+    <div class="vd-hero">
+      <span class="stamp">this month!</span>
+      <p>You've spent <b>£142 on eating out</b> — £22 over budget and your biggest jump since July. Groceries? Purring along at £168 of £220.</p>
+      <div class="paw">— Mochi 🐾</div>
+    </div>
+
+    <h2 class="vd-sec">where it went</h2>
+    <div class="vd-grid">
+      <div class="vd-card over"><span class="em">🍜</span><div class="nm">Eating out</div><div class="amt">£142 of £120 — oops</div><div class="vd-bar"><i style="width:100%"></i></div></div>
+      <div class="vd-card"><span class="em">🛒</span><div class="nm">Groceries</div><div class="amt">£168 of £220</div><div class="vd-bar"><i style="width:76%"></i></div></div>
+      <div class="vd-card warn"><span class="em">🎉</span><div class="nm">Nights out</div><div class="amt">£74 of £80 — close!</div><div class="vd-bar"><i style="width:92%"></i></div></div>
+      <div class="vd-card"><span class="em">🚇</span><div class="nm">Transport</div><div class="amt">£56 of £90</div><div class="vd-bar"><i style="width:62%"></i></div></div>
+      <div class="vd-card"><span class="em">☕️</span><div class="nm">Coffee</div><div class="amt">£31 of £40</div><div class="vd-bar"><i style="width:78%"></i></div></div>
+      <div class="vd-card"><span class="em">📺</span><div class="nm">Subs</div><div class="amt">£27 of £35</div><div class="vd-bar"><i style="width:77%"></i></div></div>
+    </div>
+
+    <h2 class="vd-sec">latest paw-chases</h2>
+    <div class="vd-tx">
+      <div class="vd-tx-row"><span class="nm">Tesco Express</span><span class="cat">groceries</span><span class="amt">−£12.40</span></div>
+      <div class="vd-tx-row"><span class="nm">Wagamama</span><span class="cat">eating out</span><span class="amt">−£18.90</span></div>
+      <div class="vd-tx-row"><span class="nm">PAYPAL *WRLD</span><span class="cat unk">what's this?</span><span class="amt">−£9.99</span></div>
+      <div class="vd-tx-row"><span class="nm">TfL Travel</span><span class="cat">transport</span><span class="amt">−£5.60</span></div>
+    </div>
+  </div>
+</section>
+
+</div></div>
+
+<!-- prototype switcher — not part of any design -->
+<div class="proto-bar" role="toolbar" aria-label="Prototype variant switcher">
+  <button id="prev" aria-label="Previous variant">←</button>
+  <div class="proto-label" id="label" aria-live="polite"></div>
+  <button id="next" aria-label="Next variant">→</button>
+</div>
+
+<script>
+  const VARIANTS = [
+    ['A','Meadow — bubbly cards'],
+    ['B','Ledger — quiet list-first'],
+    ['C','Ring — chart-centric'],
+    ['D','Sticker — chunky & playful'],
+  ];
+  const keys = VARIANTS.map(v => v[0]);
+
+  function current(){
+    const q = new URLSearchParams(location.search).get('variant');
+    return keys.includes(q) ? q : 'A';
+  }
+  function show(k){
+    document.querySelectorAll('.variant').forEach(el =>
+      el.classList.toggle('active', el.id === 'v-' + k));
+    const [,name] = VARIANTS.find(v => v[0] === k);
+    document.getElementById('label').innerHTML =
+      `Variant ${k}<small>${name}</small>`;
+    const url = new URL(location.href);
+    url.searchParams.set('variant', k);
+    history.replaceState(null, '', url);
+  }
+  function step(d){
+    const i = (keys.indexOf(current()) + d + keys.length) % keys.length;
+    show(keys[i]);
+  }
+  document.getElementById('prev').addEventListener('click', () => step(-1));
+  document.getElementById('next').addEventListener('click', () => step(1));
+  document.addEventListener('keydown', e => {
+    const t = e.target;
+    if (t.matches('input, textarea, [contenteditable]')) return;
+    if (e.key === 'ArrowLeft') step(-1);
+    if (e.key === 'ArrowRight') step(1);
+  });
+  show(current());
+
+  // Statistics cards live in a hidden holding pen after variant B; mount them in variant A's Statistics page
+  document.getElementById('va-stats').append(...document.getElementById('stats-holding-pen').children);
+
+  // Variant A — bottom tab bar pages
+  const vaPages = ['va-home', 'va-cats', 'va-stats', 'va-settings'];
+  document.querySelectorAll('.va-tabs button[data-page]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.va-tabs button').forEach(t => t.classList.remove('on'));
+      tab.classList.add('on');
+      vaPages.forEach(id => {
+        document.getElementById(id).style.display = id === tab.dataset.page ? '' : 'none';
+      });
+    });
+  });
+
+  // Account selectors (variants A and B)
+  document.querySelectorAll('.vb-acct').forEach(acct => {
+    const btn = acct.querySelector('.vb-acct-btn');
+    const panel = acct.querySelector('.vb-acct-panel');
+    btn.addEventListener('click', () => {
+      const open = panel.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open);
+    });
+    acct.querySelectorAll('.vb-acct-row').forEach(row => {
+      row.addEventListener('click', () => {
+        acct.querySelectorAll('.vb-acct-row').forEach(r => r.classList.remove('sel'));
+        row.classList.add('sel');
+        acct.querySelector('.vb-acct-name-lbl').textContent = row.dataset.name;
+        panel.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.vb-acct')) {
+      document.querySelectorAll('.vb-acct-panel').forEach(p => p.classList.remove('open'));
+      document.querySelectorAll('.vb-acct-btn').forEach(b => b.setAttribute('aria-expanded', 'false'));
+    }
+  });
+</script>
+</body>
+</html>

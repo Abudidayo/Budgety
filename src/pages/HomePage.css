@@ -1,0 +1,138 @@
+/* Home page — Variant A "Meadow" styling */
+
+.home-review {
+  background: linear-gradient(120deg, #fff6e8, #ffefd6);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+.home-review-emoji {
+  font-size: 22px;
+}
+.home-review-text {
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.home-review-text b {
+  display: block;
+  font-size: 14px;
+}
+.home-review-btn {
+  margin-left: auto;
+  border: 0;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 800;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.home-hero {
+  position: relative;
+  margin-bottom: 26px;
+}
+.home-bubble {
+  background: var(--card);
+  border-radius: 26px 26px 26px 6px;
+  padding: 18px 20px;
+  box-shadow: 0 8px 24px rgba(46, 83, 57, 0.1);
+  font-size: 15.5px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.home-bubble strong {
+  color: var(--peach-deep);
+}
+
+.home-period {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.home-period button {
+  flex: 1;
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 0;
+  font-weight: 800;
+  font-size: 13px;
+  background: #dcefdf;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.home-period button[aria-pressed='true'] {
+  background: var(--ink);
+  color: #fff;
+}
+
+.home-sec {
+  font-family: 'Baloo 2', cursive;
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.home-sec a {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--leaf-deep);
+  text-decoration: none;
+}
+
+.home-tx {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 6px 16px;
+  box-shadow: 0 4px 14px rgba(46, 83, 57, 0.07);
+}
+.home-tx-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eff6f0;
+}
+.home-tx-row:last-child {
+  border-bottom: 0;
+}
+.home-tx-ic {
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  background: var(--mint-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex: none;
+}
+.home-tx-nm {
+  font-weight: 800;
+  font-size: 13.5px;
+}
+.home-tx-cat {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.home-tx-cat-review {
+  color: var(--peach-deep);
+}
+.home-tx-amt {
+  margin-left: auto;
+  font-weight: 800;
+  font-size: 13.5px;
+}
+.home-tx-amt-in {
+  color: var(--leaf-deep);
+}

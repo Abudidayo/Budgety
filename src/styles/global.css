@@ -1,0 +1,272 @@
+:root {
+  --mint-bg: #eaf6ec;
+  --mint-soft: #d6eeda;
+  --leaf: #8fcb9b;
+  --leaf-deep: #5fa873;
+  --ink: #2e5339;
+  --ink-soft: #5c7a66;
+  --card: #ffffff;
+  --peach: #ffd9a8;
+  --peach-deep: #c97f2e;
+  --rose: #f6c6c6;
+  --rose-mid: #e89a9a;
+  --rose-deep: #b85b5b;
+  --radius: 22px;
+  --font-display: 'Baloo 2', cursive;
+  --font-body: 'Nunito', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 600px at 80% -10%, #dff3e2 0%, transparent 60%),
+    radial-gradient(900px 500px at 10% 110%, #e3f4e6 0%, transparent 55%),
+    #f2f9f3;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--leaf-deep);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---- app shell: centered phone column ---- */
+.shell {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--mint-bg);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 431px) {
+  .shell {
+    margin: 24px auto;
+    min-height: calc(100vh - 48px);
+    border-radius: 36px;
+    box-shadow:
+      0 24px 60px rgba(46, 83, 57, 0.18),
+      0 2px 0 rgba(255, 255, 255, 0.8) inset;
+    overflow: clip;
+  }
+}
+
+.shell-main {
+  flex: 1;
+  padding: 0 18px 96px;
+}
+
+/* ---- header ---- */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 22px 18px 14px;
+}
+
+.header-hi {
+  font-size: 14px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.header-name {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* ---- account selector ---- */
+.acct {
+  position: relative;
+  flex: none;
+}
+
+.acct-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 800;
+  font-size: 12.5px;
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgba(46, 83, 57, 0.1);
+}
+
+.acct-btn .acct-dot {
+  width: 18px;
+  height: 12px;
+  border-radius: 3px;
+  flex: none;
+}
+
+.acct-btn .acct-chev {
+  font-size: 10px;
+  color: var(--ink-soft);
+  transition: transform 0.15s;
+}
+
+.acct-btn[aria-expanded='true'] .acct-chev {
+  transform: rotate(180deg);
+}
+
+.acct-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 240px;
+  z-index: 20;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 14px 34px rgba(46, 83, 57, 0.2);
+  padding: 6px;
+}
+
+.acct-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  background: none;
+  padding: 10px;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.acct-row:hover {
+  background: #f1f8f2;
+}
+
+.acct-row .acct-card {
+  width: 30px;
+  height: 20px;
+  border-radius: 5px;
+  flex: none;
+}
+
+.acct-row .acct-nm {
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.acct-row .acct-bal {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.acct-row .acct-tick {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--leaf-deep);
+  visibility: hidden;
+}
+
+.acct-row.sel .acct-tick {
+  visibility: visible;
+}
+
+.acct-swatch-all {
+  background: linear-gradient(120deg, var(--leaf-deep), #8fcb9b);
+}
+
+.acct-swatch-monzo {
+  background: linear-gradient(120deg, #ff6b6b, #ffb86b);
+}
+
+.acct-swatch-barclays {
+  background: linear-gradient(120deg, #4a90d9, #7fb3e8);
+}
+
+.acct-swatch-amex {
+  background: linear-gradient(120deg, #2e5339, #5c7a66);
+}
+
+/* ---- bottom tab bar ---- */
+.tabbar {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
+  background: var(--ink);
+  border-radius: 999px;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 8px;
+  box-shadow: 0 10px 24px rgba(46, 83, 57, 0.35);
+  z-index: 10;
+}
+
+.tabbar a {
+  background: none;
+  border: 0;
+  color: #a9cbb2;
+  font-size: 19px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.tabbar a.active {
+  background: var(--leaf);
+  color: var(--ink);
+}
+
+/* ---- shared bits pages can use ---- */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 14px rgba(46, 83, 57, 0.07);
+}
